@@ -1,31 +1,17 @@
 # Do not import any modules. If you do, the tester may reject your submission.
 
 # Constants for the contents of the maze.
-
-# The visual representation of a wall.
+ 
 WALL = '#'
-
-# The visual representation of a hallway.
 HALL = '.'
-
-# The visual representation of a brussels sprout.
 SPROUT = '@'
 
-# Constants for the directions. Use these to make Rats move.
+# Constants for the directions the rats will move.
 
-# The left direction.
 LEFT = -1
-
-# The right direction.
 RIGHT = 1
-
-# No change in direction.
 NO_CHANGE = 0
-
-# The up direction.
 UP = -1
-
-# The down direction.
 DOWN = 1
 
 # The letters for rat_1 and rat_2 in the maze.
@@ -77,11 +63,11 @@ class Rat:
 
         Add one sprout to num_sprouts_eaten. Yuck!
 
-        >>> r = Rat('P', 4, 5)
-        >>> r.num_sprouts_eaten
+        >>> rat = Rat('P', 4, 5)
+        >>> rat.num_sprouts_eaten
         0
-        >>> Rat.eat_sprout()
-        >>> r.num_sprouts_eaten
+        >>> rat.eat_sprout()
+        >>> rat.num_sprouts_eaten
         1
         """
         self.num_sprouts_eaten = self.num_sprouts_eaten + 1
@@ -91,9 +77,9 @@ class Rat:
 
         Return a string representation of the rat.
 
-        >>> rat = Rat('P', 1, 3, 4)
+        >>> rat = Rat('P', 4, 5)
         >>> rat.__str__()
-        'P at (1, 3) ate 4 sprouts.'
+        'P at (4, 5) ate 1 sprouts.'
         
         """
         return '{0} at ({1}, {2}) ate {3} sprouts.'.format(self.symbol, self.row, self.col, self.num_sprouts_eaten)
@@ -104,15 +90,8 @@ class Maze:
     def __init__(self, maze, rat_1, rat_2):
 
         """ (Maze, list of list of str, Rat, Rat) -> NoneType
-        >>> maze = Maze([['#', '#', '#', '#', '#', '#', '#'], 
-        ['#', '.', '.', '.', '.', '.', '#'], 
-        ['#', '.', '#', '#', '#', '.', '#'], 
-        ['#', '.', '.', '@', '#', '.', '#'], 
-        ['#', '@', '#', '.', '@', '.', '#'], 
-        ['#', '#', '#', '#', '#', '#', '#']], 
-        Rat('J', 1, 1),
-        Rat('P', 1, 4))
-        >>>
+ 
+        A 2 dimensional maze for the rat!
         """
         self.maze = maze
         self.rat_1 = rat_1
@@ -126,7 +105,45 @@ class Maze:
         self.num_sprouts_left = sprouts
                 
 
+    def __str__(self):
+
+        """ (Maze) -> str
+
+        Return a string representation of the maze.
+
+        >>> maze = Maze([['#', '#', '#', '#', '#', '#', '#'], 
+        ['#', '.', '.', '.', '.', '.', '#'], 
+        ['#', '.', '#', '#', '#', '.', '#'], 
+        ['#', '.', '.', '@', '#', '.', '#'], 
+        ['#', '@', '#', '.', '@', '.', '#'], 
+        ['#', '#', '#', '#', '#', '#', '#']], 
+        Rat('J', 1, 1),
+        Rat('P', 1, 4))
+        >>> __str__(maze)
+        #######
+        #J..P.#
+        #.###.#
+        #..@#.#
+        #@#.@.#
+        #######
+        J at (1, 1) ate 0 sprouts.
+        P at (1, 4) ate 0 sprouts.
+        """
+        # Place rats in the maze
+        self.maze[self.rat_1.row][self.rat_1.col] = RAT_1_CHAR
+        self.maze[self.rat_2.row][self.rat_2.col] = RAT_2_CHAR
+        board = ''
+        for row in self.maze:
+            for value in row:
+                board += value
+            board += '\n'
+        board = board + str(self.rat_1) + '\n'
+        board += str(self.rat_2)
+            
+        print (board)
+
     def is_wall(self, row, col):
+
         """ (Maze, int, int) -> bool
 
         Check to see if there is a wall at given coordinates.
@@ -170,11 +187,13 @@ class Maze:
         >>> Maze.get_character(maze, 1, 4)
         'P'
         """
-        elem = self.maze[row][col]
-        if self.rat_1.set_location() == (row, col):
+ 
+        if self.rat_1.set_location(row, col) == (row, col):
             elem = self.rat_1.symbol
-        if self.rat_2.set_location() == (row, col):
+        elif self.rat_2.set_location(row, col) == (row, col):
             elem = self.rat_2.symbol
+        else:
+            elem = self.maze[row][col]
         return elem
 
     def move(self, Rat, vert_change, hor_change):
@@ -192,39 +211,9 @@ class Maze:
                 self.maze[new_location[0], new_location[1]] = HALL
                 self.num_sprouts_left -= 1
             return True
-                
-    def __str__(self):
-       """ (Maze) -> str
-
-        Return a string representation of the maze.
-
-        >>> maze = Maze([['#', '#', '#', '#', '#', '#', '#'], 
-        ['#', '.', '.', '.', '.', '.', '#'], 
-        ['#', '.', '#', '#', '#', '.', '#'], 
-        ['#', '.', '.', '@', '#', '.', '#'], 
-        ['#', '@', '#', '.', '@', '.', '#'], 
-        ['#', '#', '#', '#', '#', '#', '#']], 
-        Rat('J', 1, 1),
-        Rat('P', 1, 4))
-        >>> str(maze)
-        #######
-        #J..P.#
-        #.###.#
-        #..@#.#
-        #@#.@.#
-        #######
-        J at (1, 1) ate 0 sprouts.
-        P at (1, 4) ate 0 sprouts.
-        """
-        board = ""
-        for i in range(len(self.maze)):
-            for j in range(len(self.maze[0])):
-                char = self.get_character(i, j)
-                board += "\n"
-            board += str(self.rat_1)
-            board += "\n"
-            board += str(self.rat_2)
-            return board + self.symbol + ' at (' + self.row + ', ' \
-            + self.col + ') ate ' + self.num_sprouts_eaten + ' sprouts.'
-  
+##                
+##if __name__ == "__main__":
+##    import doctest
+##    doctest.testmod()
+##  
                 
