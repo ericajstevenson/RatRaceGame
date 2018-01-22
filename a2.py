@@ -187,18 +187,19 @@ class Maze:
         >>> Maze.get_character(maze, 1, 4)
         'P'
         """
- 
-        if self.rat_1.set_location(row, col) == (row, col):
-            elem = self.rat_1.symbol
-        elif self.rat_2.set_location(row, col) == (row, col):
-            elem = self.rat_2.symbol
-        else:
-            elem = self.maze[row][col]
-        return elem
+
+        # Place rats in the maze at given row and col
+        self.maze[self.rat_1.row][self.rat_1.col] = self.rat_1.symbol
+        self.maze[self.rat_2.row][self.rat_2.col] = self.rat_2.symbol
+
+        # Return the character in the maze at given row and col
+        return self.maze[row][col]
 
     def move(self, Rat, vert_change, hor_change):
 
         """ (Maze, Rat, int, int) -> bool
+
+        Move the rat to a new location. Eat sprout if new location contains a sprout.
         """
         new_location = (Rat.row + vert_change, Rat.col + hor_change)
         elem = self.get_character(new_location[0], new_location[1])
